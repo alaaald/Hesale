@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>الفئات - HeSale</title>
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-hero" id="catHero">
+    <div class="container">
+      <h1>📂 الفئات</h1>
+      <p>تصفح المقالات حسب الموضوع</p>
+    </div>
+  </section>
+
+  <div class="container" id="catContent">
+    <div class="category-grid" id="categoryGrid"></div>
+    <div id="categoryPosts" style="display:none">
+      <div class="posts-grid" id="postsGrid"></div>
+      <div id="pagination"></div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <script src="script.js"></script>
+  <script src="analytics.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initializeData();
+      initPublicPage('categories');
+
+      const params = new URLSearchParams(location.search);
+      const cat = params.get('cat');
+      const page = parseInt(params.get('page') || '1');
+
+      if (cat) {
+        document.querySelector('#catHero h1').textContent = cat;
+        document.querySelector('#catHero p').textContent = `جميع مقالات فئة ${cat}`;
+        document.getElementById('categoryGrid').style.display = 'none';
+        document.getElementById('categoryPosts').style.display = 'block';
+        const { posts, totalPages, currentPage } = PostsManager.getByCategory(cat, page, 12);
+        SEO.setMeta({ title: `${cat} - HeSale`, description: `مقالات فئة ${cat} في مدونة HeSale` });
+        document.getElementById('postsGrid').innerHTML = posts.map(p => renderPostCard(p)).join('') || '<p class="no-results">لا توجد مقالات في هذه الفئة</p>';
+        document.getElementById('pagination').innerHTML = renderPagination(currentPage, totalPages, `category.html?cat=${encodeURIComponent(cat)}&`);
+      } else {
+        SEO.setMeta({ title: 'الفئات - HeSale', description: 'تصفح فئات مدونة HeSale' });
+        const cats = PostsManager.getCategories();
+        document.getElementById('categoryGrid').innerHTML = Object.entries(cats).map(([c, n]) => `
+          <a href="category.html?cat=${encodeURIComponent(c)}" class="category-card">
+            <div style="font-size:2.5rem">📁</div>
+            <h3>${Security.escapeHtml(c)}</h3>
+            <p class="count">${n} مقالة</p>
+          </a>`).join('');
+      }
+    });
+  </script>
+</body>
+</html>

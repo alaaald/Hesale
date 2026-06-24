@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://hesale.blog/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://hesale.blog/index.html</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://hesale.blog/search.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://hesale.blog/category.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://hesale.blog/about.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://hesale.blog/contact.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://hesale.blog/post.html?slug=afdal-wajhat-safar-arabiya</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://hesale.blog/post.html?slug=wasafat-sariya-lil-asha</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://hesale.blog/post.html?slug=kayf-tabda-yawmak-bitaqa</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://hesale.blog/post.html?slug=afdal-al-musalsalat</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://hesale.blog/post.html?slug=afdal-al-anshita-al-aailya</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+</urlset>

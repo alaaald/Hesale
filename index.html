@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HeSale - سيل | مدونة عربية لنشر مقالات متنوعة عن الحياة، السفر، الطعام، والترفيه">
+  <meta name="keywords" content="HeSale, سيل, مدونة, أسلوب حياة, سفر, منوعات">
+  <meta property="og:title" content="HeSale - سيل | مدونة عربية">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://hesale.blog/">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <title>HeSale - سيل | مدونة عربية</title>
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="hero">
+    <div class="container hero-content">
+      <h1>HeSale <small style="font-weight:300;opacity:.85">سيل</small></h1>
+      <p id="heroDesc">مدونة عربية — مقالات متنوعة عن الحياة، السفر، الطعام، والترفيه</p>
+      <a href="#latest" class="btn btn-primary">اقرأ آخر المقالات ←</a>
+    </div>
+  </section>
+
+  <div class="container">
+    <section class="featured-section" style="padding-top:48px">
+      <h2 class="section-title">⭐ مقالات مميزة</h2>
+      <div class="featured-grid" id="featuredGrid"></div>
+    </section>
+  </div>
+
+  <div class="container page-layout" id="latest">
+    <main class="main-content">
+      <div class="section-header">
+        <h2 class="section-title" style="margin:0;border:none">📰 آخر المقالات</h2>
+      </div>
+      <div class="posts-grid" id="postsGrid"></div>
+      <div id="pagination"></div>
+    </main>
+    <div id="sidebar"></div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <script src="script.js"></script>
+  <script src="analytics.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initializeData();
+      const s = SettingsManager.get();
+      document.getElementById('heroDesc').textContent = s.blogDescription;
+      SEO.setMeta({ title: `HeSale - ${s.blogNameAr || 'سيل'} | مدونة عربية`, description: s.blogDescription, keywords: s.blogKeywords, url: s.siteUrl });
+
+      initPublicPage('home');
+      document.getElementById('sidebar').innerHTML = renderSidebar();
+
+      const featured = PostsManager.getFeatured(3);
+      document.getElementById('featuredGrid').innerHTML = featured.map(p => `
+        <a href="post.html?slug=${encodeURIComponent(p.slug)}" class="featured-card">
+          <img src="${Security.escapeHtml(p.image)}" alt="${Security.escapeHtml(p.title)}" loading="lazy">
+          <div class="featured-overlay">
+            <span>${p.emoji} ${Security.escapeHtml(p.category)}</span>
+            <h3>${Security.escapeHtml(p.title)}</h3>
+            <p>${Security.escapeHtml(p.excerpt)}</p>
+          </div>
+        </a>`).join('');
+
+      const page = parseInt(new URLSearchParams(location.search).get('page') || '1');
+      const { posts, totalPages, currentPage } = PostsManager.getPaginated(page, 12);
+      document.getElementById('postsGrid').innerHTML = posts.map(p => renderPostCard(p)).join('') || '<p class="no-results">لا توجد مقالات</p>';
+      document.getElementById('pagination').innerHTML = renderPagination(currentPage, totalPages, 'index.html?');
+    });
+  </script>
+</body>
+</html>

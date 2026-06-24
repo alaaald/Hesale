@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ابحث في مقالات HeSale">
+  <link rel="stylesheet" href="style.css">
+  <title>البحث - HeSale</title>
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="search-hero">
+    <div class="container">
+      <h1>🔍 البحث في المقالات</h1>
+      <form class="search-box-large" action="search.html" method="get">
+        <input type="search" name="q" id="mainSearch" placeholder="ابحث عن مقال، موضوع، أو كلمة مفتاحية..." value="">
+        <button type="submit">بحث</button>
+      </form>
+    </div>
+  </section>
+
+  <div class="container search-layout">
+    <aside class="filters-panel">
+      <h3 style="margin-bottom:16px">الفلاتر</h3>
+      <div class="filter-group">
+        <h4>الفئات</h4>
+        <div id="categoryFilters"></div>
+      </div>
+      <div class="filter-group">
+        <h4>التاريخ</h4>
+        <label>من <input type="date" id="dateFrom" class="form-control" style="margin-top:6px"></label>
+        <label style="margin-top:10px;display:block">إلى <input type="date" id="dateTo" class="form-control" style="margin-top:6px"></label>
+      </div>
+      <div class="filter-group">
+        <h4>الترتيب</h4>
+        <select id="sortFilter" class="form-control">
+          <option value="newest">الأحدث</option>
+          <option value="oldest">الأقدم</option>
+          <option value="views">الأكثر مشاهدة</option>
+        </select>
+      </div>
+    </aside>
+    <main>
+      <p class="results-count" id="resultsCount"></p>
+      <div class="posts-grid" id="searchResults"></div>
+      <div id="searchPagination"></div>
+    </main>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <script src="script.js"></script>
+  <script src="analytics.js"></script>
+  <script>
+    const PER_PAGE = 9;
+    let currentPage = 1;
+
+    function getSelectedCategories() {
+      return [...document.querySelectorAll('.cat-check:checked')].map(c => c.value);
+    }
+
+    function doSearch() {
+      const q = document.getElementById('mainSearch').value;
+      const filters = {
+        categories: getSelectedCategories(),
+        dateFrom: document.getElementById('dateFrom').value,
+        dateTo: document.getElementById('dateTo').value,
+        sort: document.getElementById('sortFilter').value
+      };
+      const all = PostsManager.search(q, filters);
+      const totalPages = Math.ceil(all.length / PER_PAGE);
+      const results = all.slice((currentPage-1)*PER_PAGE, currentPage*PER_PAGE);
+      document.getElementById('resultsCount').textContent = `تم العثور على ${all.length} نتيجة`;
+      document.getElementById('searchResults').innerHTML = results.length
+        ? results.map(p => renderPostCard(p)).join('')
+        : '<div class="no-results"><h3>لا توجد نتائج</h3><p>جرب كلمات أو فلاتر مختلفة</p></div>';
+      document.getElementById('searchPagination').innerHTML = renderPagination(currentPage, totalPages, `search.html?q=${encodeURIComponent(q)}&`);
+    }
+
+    function debounceLocal(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initializeData();
+      initPublicPage('search');
+      SEO.setMeta({ title: 'البحث - HeSale', description: 'ابحث في مقالات HeSale المتنوعة' });
+
+      const params = new URLSearchParams(location.search);
+      if (params.get('q')) document.getElementById('mainSearch').value = params.get('q');
+
+      const cats = PostsManager.getCategories();
+      document.getElementById('categoryFilters').innerHTML = Object.keys(cats).map(c =>
+        `<label><input type="checkbox" class="cat-check" value="${Security.escapeHtml(c)}"> ${Security.escapeHtml(c)} (${cats[c]})</label>`
+      ).join('');
+
+      doSearch();
+      document.getElementById('mainSearch').addEventListener('input', debounceLocal(() => { currentPage = 1; doSearch(); }, 300));
+      document.querySelectorAll('#dateFrom,#dateTo,#sortFilter').forEach(el => el.addEventListener('change', () => { currentPage = 1; doSearch(); }));
+      document.getElementById('categoryFilters').addEventListener('change', () => { currentPage = 1; doSearch(); });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin-panel.html
+Disallow: /admin-posts.html
+Disallow: /admin-edit-post.html
+Disallow: /admin-ads.html
+Disallow: /admin-analytics.html
+Disallow: /admin-settings.html
+
+Sitemap: https://hesale.blog/sitemap.xml

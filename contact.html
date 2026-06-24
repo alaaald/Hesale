@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>تواصل معنا - HeSale</title>
+</head>
+<body>
+  <div id="site-header"></div>
+  <section class="page-hero"><div class="container"><h1>تواصل معنا</h1><p>نسعد بسماعك — أرسل رسالتك وسنرد في أقرب وقت</p></div></section>
+  <div class="container contact-grid">
+    <div class="contact-info">
+      <h3>معلومات التواصل</h3>
+      <p>📧 admin@hesale.blog</p>
+      <p>🌐 hesale.blog</p>
+      <p>نرد عادةً خلال 24-48 ساعة عمل</p>
+      <div class="social-links" id="contactSocial" style="margin-top:24px"></div>
+    </div>
+    <form class="contact-form" id="contactForm" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:32px">
+      <div class="form-group"><label for="name">الاسم الكامل</label><input type="text" id="name" class="form-control" required></div>
+      <div class="form-group"><label for="email">البريد الإلكتروني</label><input type="email" id="email" class="form-control" required></div>
+      <div class="form-group"><label for="subject">الموضوع</label><input type="text" id="subject" class="form-control" required></div>
+      <div class="form-group"><label for="message">الرسالة</label><textarea id="message" class="form-control" rows="6" required></textarea></div>
+      <button type="submit" class="btn btn-primary btn-block">إرسال الرسالة</button>
+    </form>
+  </div>
+  <div id="site-footer"></div>
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <script src="script.js"></script>
+  <script src="analytics.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initializeData();
+      initPublicPage('contact');
+      SEO.setMeta({ title: 'تواصل معنا - HeSale', description: 'تواصل مع فريق HeSale' });
+      const social = SettingsManager.get().socialLinks || {};
+      document.getElementById('contactSocial').innerHTML = Object.entries(social).filter(([,v])=>v).map(([k,v])=>`<a href="${Security.escapeHtml(v)}" target="_blank" rel="noopener" style="color:#fff">${k}</a>`).join('');
+      document.getElementById('contactForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const d = HeSaleAnalytics.getData(); d.comments = (d.comments||0)+1; HeSaleAnalytics.saveData(d);
+        showToast('تم إرسال رسالتك بنجاح!', 'success'); e.target.reset();
+      });
+    });
+  </script>
+</body>
+</html>

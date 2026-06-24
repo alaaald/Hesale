@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>المقالات - HeSale</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar"></aside>
+    <main class="admin-main">
+      <div class="admin-header">
+        <div><button class="admin-menu-toggle">☰</button><h1>إدارة المقالات</h1></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a href="admin-edit-post.html" class="btn btn-primary">➕ جديد</a>
+          <button class="btn btn-secondary" id="exportBtn">📤 تصدير</button>
+          <button class="btn btn-secondary" id="importBtn">📥 استيراد</button>
+          <input type="file" id="importFile" accept=".json" hidden>
+        </div>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <input type="text" id="postSearch" class="form-control" placeholder="بحث..." style="width:200px">
+            <select id="statusFilter" class="form-control"><option value="">كل الحالات</option><option value="published">منشورة</option><option value="draft">مسودة</option><option value="archived">أرشيف</option></select>
+            <button class="btn btn-danger btn-sm" id="batchDelete">🗑️ حذف المحدد</button>
+          </div>
+        </div>
+        <div class="admin-card-body table-responsive">
+          <table class="admin-table">
+            <thead><tr><th><input type="checkbox" id="selectAll"></th><th>العنوان</th><th>التاريخ</th><th>الفئة</th><th>المشاهدات</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+            <tbody id="postsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <script src="script.js"></script>
+  <script src="analytics.js"></script>
+  <script src="admin.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initializeData();
+      if (!Auth.requireAuth()) return;
+      AdminUI.init('posts');
+      PostsAdmin.renderTable();
+      PostsAdmin.setupFilters();
+      PostsAdmin.setupBatch();
+      PostsAdmin.setupAutoRefresh();
+      document.getElementById('exportBtn').onclick = () => DataExport.exportAll();
+      document.getElementById('importBtn').onclick = () => document.getElementById('importFile').click();
+      document.getElementById('importFile').onchange = async e => {
+        try { await DataExport.importFromFile(e.target.files[0]); showToast('تم الاستيراد','success'); PostsAdmin.renderTable(); }
+        catch { showToast('فشل الاستيراد','error'); }
+      };
+    });
+  </script>
+</body>
+</html>

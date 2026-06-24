@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>المقالة - HeSale</title>
+</head>
+<body>
+  <div id="site-header"></div>
+  <div class="container" id="postPage"></div>
+  <div id="site-footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <script src="script.js"></script>
+  <script src="analytics.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initializeData();
+      initPublicPage();
+      const slug = new URLSearchParams(location.search).get('slug');
+      const post = slug ? PostsManager.getBySlug(slug) : null;
+      const el = document.getElementById('postPage');
+
+      if (!post || post.status !== 'published') {
+        el.innerHTML = '<div class="page-content"><h1>المقالة غير موجودة</h1><p><a href="index.html">العودة للرئيسية</a></p></div>';
+        return;
+      }
+
+      PostsManager.incrementViews(post.id);
+      SEO.setMeta({
+        title: post.seoTitle || post.title,
+        description: post.seoDescription || post.excerpt,
+        keywords: post.tags?.join(', '),
+        image: post.ogImage || post.image,
+        url: `${SettingsManager.get().siteUrl}/post.html?slug=${post.slug}`,
+        type: 'article',
+        article: post
+      });
+
+      let content = AdsManager.insertAdsInContent(post.content);
+      const toc = generateTOC(content);
+      content = toc.content;
+
+      el.innerHTML = `
+        <nav class="breadcrumb"><a href="index.html">الرئيسية</a><span>›</span><a href="category.html?cat=${encodeURIComponent(post.category)}">${Security.escapeHtml(post.category)}</a><span>›</span><span>${Security.escapeHtml(post.title)}</span></nav>
+        <div class="post-layout">
+          <article>
+            <header class="post-hero">
+              <span class="post-category">${Security.escapeHtml(post.category)}</span>
+              <h1>${post.emoji || ''} ${Security.escapeHtml(post.title)}</h1>
+              <div class="post-meta-bar">
+                <span>👤 ${Security.escapeHtml(post.author)}</span>
+                <span>📅 ${formatDate(post.date)}</span>
+                <span>⏱ ${post.readTime} دقائق قراءة</span>
+                <span>👁 ${post.views} مشاهدة</span>
+              </div>
+              <img src="${Security.escapeHtml(post.image)}" alt="${Security.escapeHtml(post.title)}" class="post-cover" loading="lazy">
+            </header>
+            ${toc.html}
+            <div class="article-body">${content}</div>
+            <div class="post-footer-meta">
+              <div class="tags">${(post.tags||[]).map(t => `<span class="tag">#${Security.escapeHtml(t)}</span>`).join('')}</div>
+              ${renderShareButtons(post)}
+              <div class="author-box">
+                <img src="${SettingsManager.get().authorImage || 'https://via.placeholder.com/64'}" alt="المؤلف">
+                <div><h4>${Security.escapeHtml(post.author)}</h4><p>${Security.escapeHtml(SettingsManager.get().authorBio || '')}</p></div>
+              </div>
+              ${AdsManager.renderAd('ad-slot-4')}
+            </div>
+            <section class="related-posts" style="margin-top:40px">
+              <h2 class="section-title">مقالات مرتبطة</h2>
+              <div class="posts-grid">${PostsManager.getRelated(post, 4).map(p => renderPostCard(p)).join('')}</div>
+            </section>
+            <section style="margin-top:40px">
+              <h2 class="section-title">✉️ تواصل معنا</h2>
+              <form class="contact-form" id="contactForm" style="background:var(--bg-alt);padding:24px;border-radius:var(--radius)">
+                <div class="form-row">
+                  <div class="form-group"><label>الاسم</label><input type="text" class="form-control" required></div>
+                  <div class="form-group"><label>البريد</label><input type="email" class="form-control" required></div>
+                </div>
+                <div class="form-group"><label>الرسالة</label><textarea class="form-control" required></textarea></div>
+                <button type="submit" class="btn btn-primary">إرسال</button>
+              </form>
+            </section>
+          </article>
+          <aside>${renderSidebar({ newsletter: true })}</aside>
+        </div>`;
+
+      document.getElementById('contactForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const d = HeSaleAnalytics.getData(); d.comments = (d.comments||0)+1; HeSaleAnalytics.saveData(d);
+        showToast('تم إرسال رسالتك بنجاح', 'success'); e.target.reset();
+      });
+      document.getElementById('site-footer').innerHTML = renderFooter();
+    });
+  </script>
+</body>
+</html>

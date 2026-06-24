@@ -1,0 +1,44 @@
+{
+  "ads": [
+    {
+      "id": "ad-slot-1",
+      "name": "Ad Slot 1",
+      "type": "custom-html",
+      "code": "<div class=\"ad-placeholder\"><span>📢 مساحة إعلانية</span><small>300×250</small></div>",
+      "placement": "sidebar",
+      "enabled": true,
+      "width": "300px",
+      "height": "250px"
+    },
+    {
+      "id": "ad-slot-2",
+      "name": "Ad Slot 2",
+      "type": "custom-html",
+      "code": "<div class=\"ad-placeholder\"><span>📢 إعلان داخل المقالة</span><small>728×90</small></div>",
+      "placement": "in-post",
+      "enabled": true,
+      "width": "728px",
+      "height": "90px"
+    },
+    {
+      "id": "ad-slot-3",
+      "name": "Ad Slot 3",
+      "type": "custom-html",
+      "code": "<div class=\"ad-placeholder\"><span>📢 إعلان داخل المقالة</span><small>300×250</small></div>",
+      "placement": "in-post",
+      "enabled": true,
+      "width": "300px",
+      "height": "250px"
+    },
+    {
+      "id": "ad-slot-4",
+      "name": "Ad Slot 4",
+      "type": "custom-html",
+      "code": "<div class=\"ad-placeholder\"><span>📢 إعلان أسفل المقالة</span><small>300×250</small></div>",
+      "placement": "footer",
+      "enabled": true,
+      "width": "300px",
+      "height": "250px"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>الإعدادات - HeSale</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar"></aside>
+    <main class="admin-main">
+      <div class="admin-header"><div><button class="admin-menu-toggle">☰</button><h1>الإعدادات</h1></div></div>
+      <div class="settings-grid">
+        <div class="admin-card"><div class="admin-card-header"><h2>معلومات المدونة</h2></div><div class="admin-card-body">
+          <form id="settingsForm"><div id="csrfContainer"></div>
+            <div class="form-row"><div class="form-group"><label>اسم المدونة</label><input id="blogName" class="form-control"></div><div class="form-group"><label>الاسم العربي</label><input id="blogNameAr" class="form-control"></div></div>
+            <div class="form-group"><label>الوصف</label><textarea id="blogDescription" class="form-control" rows="3"></textarea></div>
+            <div class="form-row"><div class="form-group"><label>الشعار (إيموجي)</label><input id="blogLogo" class="form-control"></div><div class="form-group"><label>الكلمات المفتاحية</label><input id="blogKeywords" class="form-control"></div></div>
+            <div class="form-group"><label>رابط الموقع</label><input id="siteUrl" class="form-control"></div>
+            <div class="form-row"><div class="form-group"><label>اللون الأساسي</label><div class="color-row"><input type="color" id="primaryColor"><input class="form-control" readonly id="primaryColorText"></div></div><div class="form-group"><label>اللون الثانوي</label><div class="color-row"><input type="color" id="secondaryColor"><input class="form-control" readonly id="secondaryColorText"></div></div></div>
+            <h4 style="margin:20px 0 12px">التكاملات</h4>
+            <div class="form-group"><label>Google AdSense ID</label><input id="googleAdSenseId" class="form-control" placeholder="ca-pub-xxx"></div>
+            <div class="form-group"><label>Google Analytics ID</label><input id="googleAnalyticsId" class="form-control" placeholder="G-xxx"></div>
+            <div class="form-group"><label>Search Console</label><input id="googleSearchConsoleCode" class="form-control"></div>
+            <div class="form-group"><label>Facebook Pixel</label><input id="facebookPixelId" class="form-control"></div>
+            <h4 style="margin:20px 0 12px">التواصل الاجتماعي</h4>
+            <div class="form-row"><div class="form-group"><label>Facebook</label><input id="social_facebook" class="form-control"></div><div class="form-group"><label>Twitter</label><input id="social_twitter" class="form-control"></div></div>
+            <div class="form-row"><div class="form-group"><label>LinkedIn</label><input id="social_linkedin" class="form-control"></div><div class="form-group"><label>Instagram</label><input id="social_instagram" class="form-control"></div></div>
+            <div class="form-group"><label>اسم المستخدم</label><input id="adminUsername" class="form-control"></div>
+            <button type="submit" class="btn btn-primary">💾 حفظ</button>
+          </form>
+        </div></div>
+        <div>
+          <div class="admin-card"><div class="admin-card-header"><h2>🔐 الأمان</h2></div><div class="admin-card-body">
+            <form id="passwordForm">
+              <div class="form-group"><label>كلمة السر الحالية</label><input type="password" id="currentPassword" class="form-control" required></div>
+              <div class="form-group"><label>كلمة السر الجديدة</label><input type="password" id="newPassword" class="form-control" required minlength="8"></div>
+              <div class="form-group"><label>تأكيد</label><input type="password" id="confirmPassword" class="form-control" required></div>
+              <button type="submit" class="btn btn-warning">تغيير كلمة السر</button>
+            </form>
+          </div></div>
+          <div class="admin-card"><div class="admin-card-header"><h2>💾 النسخ الاحتياطي</h2></div><div class="admin-card-body">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+              <button id="exportBtn" class="btn btn-accent">📤 تصدير JSON</button>
+              <button id="importBtn" class="btn btn-secondary">📥 استيراد</button>
+              <input type="file" id="importFile" accept=".json" hidden>
+            </div>
+            <button id="deleteAllBtn" class="btn btn-danger">⚠️ حذف جميع البيانات</button>
+          </div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <script src="script.js"></script>
+  <script src="analytics.js"></script>
+  <script src="admin.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initializeData();
+      if (!Auth.requireAuth()) return;
+      AdminUI.init('settings');
+      document.getElementById('csrfContainer').innerHTML = getCSRFInput();
+      SettingsAdmin.init();
+      ['primaryColor','secondaryColor'].forEach(id => {
+        const c = document.getElementById(id), t = document.getElementById(id+'Text');
+        if (c && t) { t.value = c.value; c.oninput = () => t.value = c.value; }
+      });
+    });
+  </script>
+</body>
+</html>

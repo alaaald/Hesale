@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>HeSale</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <section id="loginSection" class="login-wrap">
+    <div class="login-box">
+      <h1>⚡ HeSale</h1>
+      <p>تسجيل الدخول</p>
+      <form id="loginForm">
+        <div class="form-group"><label>اسم المستخدم أو البريد</label><input type="text" id="username" class="form-control" required autocomplete="username"></div>
+        <div class="form-group"><label>كلمة السر</label><input type="password" id="password" class="form-control" required autocomplete="current-password"></div>
+        <label style="display:flex;gap:8px;margin-bottom:16px;align-items:center"><input type="checkbox" id="rememberMe"> تذكرني</label>
+        <button type="submit" class="btn btn-primary btn-block">دخول</button>
+      </form>
+    </div>
+  </section>
+
+  <div id="dashboardSection" class="hidden">
+    <div class="admin-layout">
+      <aside class="admin-sidebar"></aside>
+      <main class="admin-main">
+        <div class="admin-header">
+          <div><button class="admin-menu-toggle">☰</button><h1>لوحة التحكم</h1></div>
+          <a href="admin-edit-post.html" class="btn btn-primary">➕ مقالة جديدة</a>
+        </div>
+        <div class="stats-grid" id="dashStats"></div>
+        <div class="admin-card"><div class="admin-card-header"><h2>الزيارات الأسبوعية</h2></div><div class="admin-card-body"><div class="chart-wrap"><canvas id="dashChart"></canvas></div></div></div>
+        <div class="admin-card"><div class="admin-card-header"><h2>آخر المقالات</h2></div><div class="admin-card-body table-responsive"><table class="admin-table"><thead><tr><th>العنوان</th><th>التاريخ</th><th>الحالة</th><th>المشاهدات</th><th></th></tr></thead><tbody id="dashLatest"></tbody></table></div></div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <script src="script.js"></script>
+  <script src="analytics.js"></script>
+  <script src="admin.js"></script>
+  <script>document.addEventListener('DOMContentLoaded',async()=>{await initializeData();LoginPage.init();});</script>
+</body>
+</html>

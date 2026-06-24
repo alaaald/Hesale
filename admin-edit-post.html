@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>تحرير مقالة - HeSale</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar"></aside>
+    <main class="admin-main">
+      <div class="admin-header">
+        <div><button class="admin-menu-toggle">☰</button><h1 id="editorTitle">مقالة جديدة</h1></div>
+        <a href="admin-posts.html" class="btn btn-secondary">← رجوع</a>
+      </div>
+      <div class="admin-card"><div class="admin-card-body">
+        <form id="postForm">
+          <input type="hidden" id="postId">
+          <div id="csrfContainer"></div>
+          <div class="form-group"><label>العنوان *</label><input type="text" id="postTitle" class="form-control" required></div>
+          <div class="form-group"><label>الوصف القصير (Meta) *</label><textarea id="postExcerpt" class="form-control" rows="2" maxlength="160" required></textarea></div>
+          <div class="form-group"><label>المحتوى</label>
+            <div class="editor-toolbar">
+              <button type="button" data-cmd="bold"><b>B</b></button>
+              <button type="button" data-cmd="italic"><i>I</i></button>
+              <button type="button" data-cmd="underline"><u>U</u></button>
+              <button type="button" data-cmd="formatBlock" data-val="h2">H2</button>
+              <button type="button" data-cmd="formatBlock" data-val="h3">H3</button>
+              <button type="button" data-cmd="insertUnorderedList">• قائمة</button>
+              <button type="button" data-cmd="insertOrderedList">1. قائمة</button>
+              <button type="button" data-cmd="createLink">🔗</button>
+              <button type="button" data-cmd="formatBlock" data-val="pre">&lt;/&gt;</button>
+            </div>
+            <div id="postContent" class="rich-editor" contenteditable="true"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>الفئة</label><select id="postCategory" class="form-control"><option>أسلوب حياة</option><option>سفر</option><option>طعام</option><option>صحة</option><option>أزياء</option><option>ترفيه</option><option>تسوق</option><option>منزل</option><option>ثقافة</option><option>منوعات</option></select></div>
+            <div class="form-group"><label>الإيموجي</label><input type="text" id="postEmoji" class="form-control" maxlength="4" placeholder="💻"></div>
+          </div>
+          <div class="form-group"><label>الكلمات المفتاحية (مفصولة بفواصل)</label><input type="text" id="postTags" class="form-control"></div>
+          <div class="form-group"><label>صورة الغلاف (URL)</label><input type="url" id="postImage" class="form-control"><img id="imagePreview" class="image-preview" style="max-width:200px;margin-top:10px;display:none;border-radius:8px" alt=""></div>
+          <details style="margin:20px 0"><summary style="cursor:pointer;font-weight:700">إعدادات متقدمة</summary>
+            <div style="margin-top:16px" class="form-row">
+              <div class="form-group"><label>Slug مخصص</label><input type="text" id="customSlug" class="form-control"><small>معاينة: <span id="slugPreview">-</span></small></div>
+              <div class="form-group"><label>تاريخ النشر</label><input type="date" id="publishDate" class="form-control"></div>
+            </div>
+            <div class="form-group"><label>عنوان SEO</label><input type="text" id="seoTitle" class="form-control"></div>
+            <div class="form-group"><label>وصف SEO</label><textarea id="seoDescription" class="form-control" rows="2"></textarea></div>
+            <div class="form-group"><label>صورة Open Graph</label><input type="url" id="ogImage" class="form-control"></div>
+            <div class="form-row">
+              <div class="form-group"><label>الحالة</label><select id="postStatus" class="form-control"><option value="draft">مسودة</option><option value="published">منشورة</option><option value="archived">أرشيف</option></select></div>
+              <div class="form-group"><label>&nbsp;</label><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="postFeatured"> مقالة مميزة</label></div>
+            </div>
+            <p>وقت القراءة: <strong id="readTimePreview">-</strong> دقيقة (تلقائي)</p>
+          </details>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button type="submit" class="btn btn-secondary" data-action="draft">💾 حفظ كمسودة</button>
+            <button type="submit" class="btn btn-primary" data-action="published">🚀 نشر</button>
+            <button type="button" class="btn btn-accent" id="previewBtn">👁️ معاينة</button>
+            <a href="admin-posts.html" class="btn btn-secondary">❌ إلغاء</a>
+          </div>
+        </form>
+      </div></div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <script src="script.js"></script>
+  <script src="analytics.js"></script>
+  <script src="admin.js"></script>
+  <script>document.addEventListener('DOMContentLoaded',async()=>{await initializeData();if(!Auth.requireAuth())return;AdminUI.init('edit');document.getElementById('csrfContainer').innerHTML=getCSRFInput();PostEditor.init();});</script>
+</body>
+</html>

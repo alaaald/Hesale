@@ -1,0 +1,24 @@
+{
+  "blogName": "HeSale",
+  "blogNameAr": "سيل",
+  "blogDescription": "مدونة HeSale — سيل | منصة عربية لنشر مقالات متنوعة عن الحياة، السفر، الطعام، الأزياء، الترفيه، وكل ما يهمك.",
+  "blogLogo": "⚡",
+  "blogKeywords": "HeSale, سيل, مدونة, أسلوب حياة, سفر, طعام, ترفيه, منوعات",
+  "primaryColor": "#0F172A",
+  "secondaryColor": "#3B82F6",
+  "accentColor": "#10B981",
+  "author": "فريق HeSale",
+  "authorBio": "فريق HeSale يكتب عن كل ما يهم القارئ العربي — قصص، أفكار، ونصائح يومية من الحياة الواقعية.",
+  "authorImage": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&q=80",
+  "googleAdSenseId": "",
+  "googleAnalyticsId": "",
+  "googleSearchConsoleCode": "",
+  "facebookPixelId": "",
+  "socialLinks": {
+    "facebook": "https://facebook.com/hesale",
+    "twitter": "https://twitter.com/hesale",
+    "linkedin": "https://linkedin.com/company/hesale",
+    "instagram": "https://instagram.com/hesale"
+  },
+  "siteUrl": "https://hesale.blog"
+}

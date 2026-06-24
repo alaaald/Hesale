@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>من نحن - HeSale</title>
+</head>
+<body>
+  <div id="site-header"></div>
+  <section class="page-hero"><div class="container"><h1>من نحن</h1><p>مدونة عربية لمحتوى متنوع عن الحياة</p></div></section>
+  <div class="container page-content">
+    <h2>HeSale — سيل</h2>
+    <p>مدونة HeSale منصة عربية مفتوحة لنشر مقالات متنوعة — عن الحياة، السفر، الطعام، الأزياء، الترفيه، الصحة، وكل ما يهم القارئ اليومي.</p>
+    <h3>رسالتنا</h3>
+    <p>نؤمن بأن المحتوى الجيد يجب أن يكون متاحاً بالعربية وفي كل المجالات. نكتب قصصاً، نصائح، وأفكاراً من الحياة الواقعية — بأسلوب واضح وقريب من القارئ.</p>
+    <div class="stats-row" id="aboutStats"></div>
+    <h3>فريقنا</h3>
+    <p>يعمل على المدونة فريق من الكتاب المتحمسين لتقديم محتوى عربي متنوع في مختلف مجالات الحياة.</p>
+  </div>
+  <div id="site-footer"></div>
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <script src="script.js"></script>
+  <script src="analytics.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initializeData();
+      initPublicPage();
+      SEO.setMeta({ title: 'من نحن - HeSale', description: 'تعرف على مدونة HeSale — مقالات متنوعة بالعربية' });
+      const posts = PostsManager.getPublished();
+      const analytics = HeSaleAnalytics.getData();
+      document.getElementById('aboutStats').innerHTML = `
+        <div class="stat-box"><h3>${posts.length}</h3><p>مقالة منشورة</p></div>
+        <div class="stat-box"><h3>${(analytics.totalViews||0).toLocaleString('ar')}</h3><p>زيارة</p></div>
+        <div class="stat-box"><h3>${Object.keys(PostsManager.getCategories()).length}</h3><p>فئة</p></div>
+        <div class="stat-box"><h3>${posts.filter(p=>p.featured).length}</h3><p>مقالة مميزة</p></div>`;
+    });
+  </script>
+</body>
+</html>
