@@ -226,7 +226,7 @@ const PostEditor = {
     if (!data.title || !data.excerpt) return showToast('العنوان والوصف مطلوبان', 'error');
     const id = document.getElementById('postId').value;
     const post = id ? PostsManager.update(id, data) : PostsManager.create(data);
-    showToast('تم الحفظ', 'success');
+    showToast(CloudDB.ready ? 'تم النشر — تظهر للجميع فوراً' : 'تم الحفظ محلياً فقط', 'success');
     if (preview) window.open(`post.html?slug=${encodeURIComponent(post.slug)}`, '_blank');
     else setTimeout(() => location.href = 'admin-posts.html', 800);
   }

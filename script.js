@@ -75,13 +75,30 @@ const Security = {
 
 /* ========== تهيئة البيانات ========== */
 async function initializeData() {
+  CloudDB.init();
+
   if (!BlogStorage.get(BlogStorage.KEYS.SETTINGS)) {
     try {
       const r = await fetch('settings.json');
       BlogStorage.set(BlogStorage.KEYS.SETTINGS, r.ok ? await r.json() : getDefaultSettings());
     } catch { BlogStorage.set(BlogStorage.KEYS.SETTINGS, getDefaultSettings()); }
   }
-  if (!BlogStorage.get(BlogStorage.KEYS.POSTS)) {
+
+  if (CloudDB.ready) {
+    try {
+      await seedCloudIfEmpty();
+      const cloudSettings = await CloudDB.loadSettings();
+      if (cloudSettings) BlogStorage.set(BlogStorage.KEYS.SETTINGS, cloudSettings);
+
+      const isAdmin = location.pathname.includes('admin');
+      const posts = (isAdmin && CloudDB.currentUser())
+        ? await CloudDB.loadAllPosts()
+        : await CloudDB.loadPublishedPosts();
+      if (posts.length) BlogStorage.set(BlogStorage.KEYS.POSTS, { posts });
+    } catch (e) { console.warn('Firebase:', e.message); }
+  }
+
+  if (!BlogStorage.get(BlogStorage.KEYS.POSTS)?.posts?.length) {
     try {
       const r = await fetch('posts.json');
       const data = await r.json();
@@ -99,7 +116,7 @@ async function initializeData() {
       analytics: { totalViews: 0, dailyViews: [], postViews: [], keywordHits: {}, comments: 0, bounceRate: 42 }
     });
   }
-  if (!BlogStorage.get(BlogStorage.KEYS.AUTH)) {
+  if (!BlogStorage.get(BlogStorage.KEYS.AUTH) && location.pathname.includes('admin')) {
     BlogStorage.set(BlogStorage.KEYS.AUTH, {
       username: 'hesale_admin',
       email: 'admin@hesale.blog',
@@ -135,6 +152,7 @@ const SettingsManager = {
     const m = { ...this.get(), ...u };
     BlogStorage.set(BlogStorage.KEYS.SETTINGS, m);
     applyThemeColors(m);
+    if (CloudDB.ready && CloudDB.currentUser()) CloudDB.saveSettings(m).catch(() => {});
     return m;
   }
 };
@@ -179,6 +197,7 @@ const PostsManager = {
     posts.push(np);
     BlogStorage.set(BlogStorage.KEYS.POSTS, { posts });
     logActivity('create', `مقالة جديدة: ${np.title}`);
+    if (CloudDB.ready) CloudDB.savePost(np).catch(e => showToast('فشل الحفظ السحابي: ' + e.message, 'error'));
     return np;
   },
   update(id, updates) {
@@ -190,20 +209,28 @@ const PostsManager = {
     if (updates.title && !updates.slug) posts[i].slug = generateSlug(updates.title);
     BlogStorage.set(BlogStorage.KEYS.POSTS, { posts });
     logActivity('update', `تعديل: ${posts[i].title}`);
+    if (CloudDB.ready) CloudDB.savePost(posts[i]).catch(e => console.warn(e));
     return posts[i];
   },
   delete(id) {
     const p = this.getById(id);
     BlogStorage.set(BlogStorage.KEYS.POSTS, { posts: this.getAll().filter(p => p.id !== parseInt(id)) });
     logActivity('delete', `حذف: ${p?.title}`);
+    if (CloudDB.ready) CloudDB.deletePost(id).catch(e => console.warn(e));
   },
   incrementViews(id) {
     const p = this.getById(id);
-    if (p) {
-      this.update(id, { views: p.views + 1 });
-      HeSaleAnalytics.trackPageView(id, p.title);
-      HeSaleAnalytics.trackKeywords(p.tags);
+    if (!p) return;
+    const views = p.views + 1;
+    const posts = this.getAll();
+    const i = posts.findIndex(x => x.id === parseInt(id));
+    if (i >= 0) {
+      posts[i].views = views;
+      BlogStorage.set(BlogStorage.KEYS.POSTS, { posts });
     }
+    if (CloudDB.ready) CloudDB.incrementViews(id, views).catch(() => {});
+    HeSaleAnalytics.trackPageView(id, p.title);
+    HeSaleAnalytics.trackKeywords(p.tags);
   },
   search(query, filters = {}) {
     let r = filters.includeDrafts ? this.getAll() : this.getPublished();
@@ -276,8 +303,25 @@ const AdsManager = {
 
 /* ========== المصادقة (للاستخدام في admin.js فقط) ========== */
 const Auth = {
-  isLoggedIn() { return !!(sessionStorage.getItem('hesale_session') || localStorage.getItem('hesale_remember')); },
+  isLoggedIn() {
+    if (CloudDB.ready && CloudDB.currentUser()) return true;
+    return !!(sessionStorage.getItem('hesale_session') || localStorage.getItem('hesale_remember'));
+  },
   async login(user, pw, remember) {
+    if (CloudDB.ready) {
+      const email = user.includes('@') ? user : user + '@hesale.blog';
+      try {
+        await CloudDB.login(email, pw);
+        await syncPostsFromCloud(true);
+        const token = Security.generateCSRFToken();
+        const data = { user: email, token, loginTime: Date.now(), cloud: true };
+        remember ? localStorage.setItem('hesale_remember', JSON.stringify(data)) : sessionStorage.setItem('hesale_session', JSON.stringify(data));
+        logActivity('login', 'تسجيل دخول (Firebase)');
+        return { success: true, token };
+      } catch (e) {
+        return { success: false, message: 'بريد أو كلمة سر غير صحيحة (Firebase)' };
+      }
+    }
     const auth = BlogStorage.get(BlogStorage.KEYS.AUTH);
     if (!auth || (auth.username !== user && auth.email !== user)) return { success: false, message: 'بيانات الدخول غير صحيحة' };
     if (!(await Security.verifyPassword(pw, auth.passwordHash))) return { success: false, message: 'كلمة السر غير صحيحة' };
@@ -288,6 +332,7 @@ const Auth = {
     return { success: true, token };
   },
   logout() {
+    if (CloudDB.ready) CloudDB.logout();
     sessionStorage.removeItem('hesale_session');
     localStorage.removeItem('hesale_remember');
     logActivity('logout', 'تسجيل خروج');
